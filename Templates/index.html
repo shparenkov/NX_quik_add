@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Selection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            color: #444;
+        }
+
+        /* Search and Sorting Form */
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input, select, button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .clear-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        .clear-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Table Styling */
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 15px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Big +/- Buttons */
+        .quantity-btn {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .decrement {
+            background-color: #f44336;
+        }
+        .increment {
+            background-color: #4CAF50;
+        }
+        .quantity-btn:hover {
+            opacity: 0.9;
+        }
+        input[type="number"] {
+            width: 60px;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        /* Sticky Review Button */
+        .sticky-review {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 15px 0;
+            z-index: 1000;
+        }
+        .review-btn {
+            padding: 15px 30px;
+            font-size: 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .review-btn:hover {
+            background-color: #45a049;
+        }
+
+        /* Padding to prevent overlap */
+        .bottom-padding {
+            height: 100px; /* Matches sticky button height */
+        }
+    </style>
+</head>
+<body>
+    <h1>Equipment Selection</h1>
+
+    <!-- Search and Sorting Form -->
+    <form method="POST" action="/">
+        <!-- Search Bar -->
+        <input type="text" name="search" placeholder="Search..." value="{{ search_query }}">
+        <button type="submit">Search</button>
+        <a href="/"><button type="button" class="clear-btn">Clear Search</button></a>
+
+        <!-- Sorting Options -->
+        <label for="category_sort">Sort Categories:</label>
+        <select name="category_sort" id="category_sort">
+            <option value="asc" {% if category_sort == 'asc' %}selected{% endif %}>A-Z</option>
+            <option value="desc" {% if category_sort == 'desc' %}selected{% endif %}>Z-A</option>
+        </select>
+
+        <label for="equipment_sort">Sort Equipment:</label>
+        <select name="equipment_sort" id="equipment_sort">
+            <option value="asc" {% if equipment_sort == 'asc' %}selected{% endif %}>A-Z</option>
+            <option value="desc" {% if equipment_sort == 'desc' %}selected{% endif %}>Z-A</option>
+        </select>
+        <button type="submit">Apply Sorting</button>
+    </form>
+
+    <!-- Equipment Table -->
+    <form method="POST" action="/summary">
+        {% for category, items in equipment_by_category.items() %}
+            <h2 style="background-color: #4CAF50; color: white; padding: 10px;">{{ category }}</h2>
+            <table>
+                <tr>
+                    <th>Type ID</th>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                </tr>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item[0] }}</td>
+                    <td>{{ item[1] }}</td>
+                    <td>
+                        <!-- Big +/- Buttons for Quantity -->
+                        <button type="button" class="quantity-btn decrement" 
+                                onclick="changeQuantity('{{ item[0] }}', -1)">-</button>
+                        <input type="number" id="quantity_{{ item[0] }}" 
+                               name="{{ item[0] }}" 
+                               value="{{ selections.get(item[0]|string, 0) }}" min="0">
+                        <button type="button" class="quantity-btn increment" 
+                                onclick="changeQuantity('{{ item[0] }}', 1)">+</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% endfor %}
+
+        <!-- Bottom Padding -->
+        <div class="bottom-padding"></div>
+
+        <!-- Sticky Bottom Review Button -->
+        <div class="sticky-review">
+            <button type="submit" class="review-btn">Review Selected Items</button>
+        </div>
+    </form>
+
+    <!-- JavaScript for Big +/- Buttons -->
+    <script>
+        function changeQuantity(id, delta) {
+            const input = document.getElementById('quantity_' + id);
+            let currentValue = parseInt(input.value) || 0;
+            let newValue = currentValue + delta;
+            if (newValue < 0) newValue = 0;  // Prevent negative values
+            input.value = newValue;
+        }
+    </script>
+</body>
+</html>

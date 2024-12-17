@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summary of Selected Items</title>
+    <style>
+        /* General Page Styling */
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f9f9f9; 
+            color: #333;
+        }
+        h1 { 
+            text-align: center; 
+            margin: 20px 0; 
+            color: #444;
+        }
+
+        /* Table Styling */
+        table {
+            width: 90%;
+            margin: 10px auto;
+            border-collapse: collapse;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        input {
+            width: 60px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Buttons Styling */
+        .btn-container {
+            text-align: center;
+            margin: 20px auto;
+        }
+        .button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .export-btn { background-color: #4CAF50; }
+        .back-btn { background-color: #2196F3; }
+        .clear-btn { background-color: #f44336; }
+        .button:hover { opacity: 0.9; }
+
+        /* Sticky Button Container */
+        .review-button-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Summary of Selected Items</h1>
+
+    <!-- Summary Table -->
+    <form method="POST" action="/summary">
+        <table>
+            <tr>
+                <th>Type ID</th>
+                <th>Description</th>
+                <th>Quantity</th>
+            </tr>
+            {% for item in summary_items %}
+            <tr>
+                <td>{{ item[0] }}</td>
+                <td>{{ item[1] }}</td>
+                <td>
+                    <input type="number" name="{{ item[0] }}" value="{{ item[2] }}" min="0">
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <div class="btn-container">
+            <button type="submit" class="button export-btn">Update Quantities</button>
+        </div>
+    </form>
+
+    <!-- Bottom Fixed Buttons -->
+    <div class="review-button-container">
+        <form method="POST" action="/export">
+            <!-- Export Button -->
+            <button type="submit" class="button export-btn">Export to CSV</button>
+            <!-- Add More Items -->
+            <a href="/"><button type="button" class="button back-btn">Add More Items</button></a>
+            <!-- Clear All -->
+            <a href="/clear"><button type="button" class="button clear-btn">Clear All</button></a>
+        </form>
+    </div>
+</body>
+</html>
